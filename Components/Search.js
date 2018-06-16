@@ -13,9 +13,12 @@ class Search extends React.Component {
     super(props)
     this._films = []
   }
-  
+
   _loadFilms() {
-    getFilmsFromApiWithSearchedText("star").then(data => console.log(data));
+    getFilmsFromApiWithSearchedText("star").then(data => {
+      this._films = data.results
+      this.forceUpdate()
+    })
   }
 
   render() {
@@ -24,7 +27,7 @@ class Search extends React.Component {
         <TextInput style={styles.textinput} placeholder='Titre du film'/>
         <Button style={{ height: 50 }} title='Rechercher' onPress={() => this._loadFilms()}/>
         <FlatList
-          data={films}
+          data={this._films}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({item}) => <FilmItem film={item}/>}
         />
