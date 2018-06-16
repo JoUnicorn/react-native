@@ -6,15 +6,20 @@ import { StyleSheet, View, TextInput, Button } from 'react-native'
 class Search extends React.Component {
   render() {
       return (
-          <View style={{ marginTop: 20 }}>
-              <TextInput style={styles.textinput} placeholder='Titre du film'/>
-              <Button style={{ height: 50 }} title='Rechercher' onPress={() => {}}/>
-          </View>
+        <View style={styles.main_container}>
+          <TextInput style={[styles.textinput, { marginBottom: 10 }]} placeholder='Titre du film'/>
+          <Button style={{ height: 50 }} title='Rechercher' onPress={() => {}}/>
+        </View>
       )
    }
 }
 
 const styles = StyleSheet.create({
+  main_container: {
+    flex: 1,
+    justifyContent: 'center',
+    marginTop: 20
+  },
   textinput: {
     marginLeft: 5,
     marginRight: 5,
