@@ -9,6 +9,11 @@ import { getFilmsFromApiWithSearchedText } from '../API/TMDBApi' // import { } f
 
 class Search extends React.Component {
 
+  constructor(props) {
+    super(props)
+    this._films = []
+  }
+  
   _loadFilms() {
     getFilmsFromApiWithSearchedText("star").then(data => console.log(data));
   }
