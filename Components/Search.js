@@ -8,7 +8,7 @@ class Search extends React.Component {
     return (
       <View style={styles.main_container}>
         <TextInput style={styles.textinput} placeholder='Titre du film'/>
-        <Button style={{ height: 50 }} title='Rechercher'/>
+        <Button style={{ height: 50 }} title='Rechercher' onPress={() => {}}/>
       </View>
     )
   }
