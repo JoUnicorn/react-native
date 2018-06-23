@@ -10,6 +10,8 @@ class Search extends React.Component {
   constructor(props) {
     super(props)
     this.searchedText = "" // Initialisation de notre donnée searchedText en dehors du state
+    this.page = 0 // Compteur pour connaître la page courante
+    this.totalPages = 0 // Nombre de pages totales pour savoir si on a atteint la fin des retours de l'API TMDB
     this.state = {
       films: [],
       isLoading: false // Par défaut à false car il n'y a pas de chargement tant qu'on ne lance pas de recherche
@@ -29,11 +31,13 @@ class Search extends React.Component {
 
   _loadFilms() {
       if (this.searchedText.length > 0) {
-        this.setState({ isLoading: true }) // Lancement du chargement
-        getFilmsFromApiWithSearchedText(this.searchedText).then(data => {
+        this.setState({ isLoading: true })
+        getFilmsFromApiWithSearchedText(this.searchedText, this.page+1).then(data => {
+            this.page = data.page
+            this.totalPages = data.total_pages
             this.setState({
-              films: data.results,
-              isLoading: false // Arrêt du chargement
+              films: [ ...this.state.films, ...data.results ],
+              isLoading: false
             })
         })
       }
@@ -43,6 +47,17 @@ class Search extends React.Component {
     this.searchedText = text // Modification du texte recherché à chaque saisie de texte, sans passer par le setState comme avant
   }
 
+  _searchFilms() {
+      this.page = 0
+      this.totalPages = 0
+      this.setState({
+        films: [],
+      }, () => {
+          console.log("Page : " + this.page + " / TotalPages : " + this.totalPages + " / Nombre de films : " + this.state.films.length)
+          this._loadFilms()
+      })
+  }
+
   render() {
     return (
       <View style={styles.main_container}>
@@ -50,13 +65,19 @@ class Search extends React.Component {
           style={styles.textinput}
           placeholder='Titre du film'
           onChangeText={(text) => this._searchTextInputChanged(text)}
-          onSubmitEditing={() => this._loadFilms()}
+          onSubmitEditing={() => this._searchFilms()}
         />
-        <Button style={{ height: 50 }} title='Rechercher' onPress={() => this._loadFilms()}/>
+        <Button style={{ height: 50 }} title='Rechercher' onPress={() => this._searchFilms()}/>
         <FlatList
           data={this.state.films}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({item}) => <FilmItem film={item}/>}
+          onEndReachedThreshold={0.5}
+          onEndReached={() => {
+            if (this.state.films.length > 0 && this.page < this.totalPages) { // On vérifie également qu'on n'a pas atteint la fin de la pagination (totalPages) avant de charger plus d'éléments
+               this._loadFilms()
+            }
+          }}
         />
         {this._displayLoading()}
       </View>
