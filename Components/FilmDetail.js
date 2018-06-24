@@ -1,7 +1,7 @@
 // Components/FilmDetail.js
 
 import React from 'react'
-import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image, Button } from 'react-native'
+import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image, Button, TouchableOpacity } from 'react-native'
 import { getFilmDetailFromApi, getImageFromApi } from '../API/TMDBApi'
 import moment from 'moment'
 import numeral from 'numeral'
@@ -45,6 +45,20 @@ class FilmDetail extends React.Component {
     this.props.dispatch(action)
   }
 
+  _displayFavoriteImage() {
+      var sourceImage = require('../Images/ic_favorite_border.png')
+      if (this.props.favoritesFilm.findIndex(item => item.id === this.state.film.id) !== -1) {
+        // Film dans nos favoris
+        sourceImage = require('../Images/ic_favorite.png')
+      }
+      return (
+        <Image
+          style={styles.favorite_image}
+          source={sourceImage}
+        />
+      )
+  }
+
   _displayFilm() {
     const { film } = this.state
     if (film != undefined) {
@@ -55,7 +69,11 @@ class FilmDetail extends React.Component {
             source={{uri: getImageFromApi(film.backdrop_path)}}
           />
           <Text style={styles.title_text}>{film.title}</Text>
-          <Button title="Favoris" onPress={() => this._toggleFavorite()}/>
+          <TouchableOpacity
+              style={styles.favorite_container}
+              onPress={() => this._toggleFavorite()}>
+              {this._displayFavoriteImage()}
+          </TouchableOpacity>
           <Text style={styles.description_text}>{film.overview}</Text>
           <Text style={styles.default_text}>Sorti le {moment(new Date(film.release_date)).format('DD/MM/YYYY')}</Text>
           <Text style={styles.default_text}>Note : {film.vote_average} / 10</Text>
@@ -122,6 +140,13 @@ const styles = StyleSheet.create({
     margin: 5,
     marginBottom: 15
   },
+  favorite_container: {
+    alignItems: 'center', // Alignement des components enfants sur l'axe secondaire, X ici
+  },
+  favorite_image: {
+      width: 40,
+      height: 40
+  },  
   default_text: {
     marginLeft: 5,
     marginRight: 5,
