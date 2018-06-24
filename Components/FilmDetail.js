@@ -1,10 +1,11 @@
 // Components/FilmDetail.js
 
 import React from 'react'
-import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image } from 'react-native'
+import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image, Button } from 'react-native'
 import { getFilmDetailFromApi, getImageFromApi } from '../API/TMDBApi'
 import moment from 'moment'
 import numeral from 'numeral'
+import { connect } from 'react-redux'
 
 class FilmDetail extends React.Component {
   constructor(props) {
@@ -24,6 +25,11 @@ class FilmDetail extends React.Component {
     })
   }
 
+  componentDidUpdate() {
+    console.log("componentDidUpdate : ")
+    console.log(this.props.favoritesFilm)
+  }
+
   _displayLoading() {
     if (this.state.isLoading) {
       return (
@@ -32,6 +38,11 @@ class FilmDetail extends React.Component {
         </View>
       )
     }
+  }
+
+  _toggleFavorite() {
+    const action = { type: "TOGGLE_FAVORITE", value: this.state.film }
+    this.props.dispatch(action)
   }
 
   _displayFilm() {
@@ -44,6 +55,7 @@ class FilmDetail extends React.Component {
             source={{uri: getImageFromApi(film.backdrop_path)}}
           />
           <Text style={styles.title_text}>{film.title}</Text>
+          <Button title="Favoris" onPress={() => this._toggleFavorite()}/>
           <Text style={styles.description_text}>{film.overview}</Text>
           <Text style={styles.default_text}>Sorti le {moment(new Date(film.release_date)).format('DD/MM/YYYY')}</Text>
           <Text style={styles.default_text}>Note : {film.vote_average} / 10</Text>
@@ -117,4 +129,10 @@ const styles = StyleSheet.create({
   }
 })
 
-export default FilmDetail
+const mapStateToProps = (state) => {
+  return {
+    favoritesFilm: state.favoritesFilm
+  }
+}
+
+export default connect(mapStateToProps)(FilmDetail)
